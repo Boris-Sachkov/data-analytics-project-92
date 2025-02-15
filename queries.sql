@@ -8,7 +8,7 @@ select
 	s.*,
 	p.price,
 	(s.quantity * p.price) as income,
-	concat(e.first_name , ' ', e.last_name ) as seller
+	e.first_name||' '|| e.last_name  as seller
 from sales s 
 inner join products p 
 on s.product_id = p.product_id
@@ -31,7 +31,7 @@ select
 	s.*,
 	p.price,
 	(s.quantity * p.price) as income,
-	concat(e.first_name , ' ', e.last_name ) as seller
+	e.first_name||' '|| e.last_name  as seller
 from sales s 
 inner join products p 
 on s.product_id = p.product_id
@@ -58,7 +58,7 @@ select
 	s.*,
 	p.price,
 	(s.quantity * p.price) as amount,
-	concat(e.first_name , ' ', e.last_name ) as seller
+	e.first_name||' '|| e.last_name  as seller
 from sales s 
 inner join products p 
 on s.product_id = p.product_id
@@ -75,6 +75,8 @@ group by t.seller, to_char(t.sale_date, 'day'), to_char(t.sale_date, 'ID')
 order by to_char(t.sale_date, 'ID'), t.seller;
 
 --возрастные категории--
+
+/*
 select 
 	age_category,
 	count(*) as age_count
@@ -100,12 +102,26 @@ from (
 	) as categorized_customers
 	group by age_category
 	order by age_category;
+	*/	
+
+--прописал через case when then--
+select 
+	case
+		when age between 16 and 25 then '16-25'
+		when age between 26 and 40 then '26-40'
+		when age > 40 then '40+'
+	end as age_category,
+	count(*) as age_count
+from customers c
+group by age_category
+order by age_category;
 
 --Количество уникальных покупателей и выручка по месяцам--
 with tab as
 	(
-		select s.*,
-			CONCAT(to_char(sale_date, 'YYYY'),'-',to_char(sale_date, 'MM')) as selling_month,
+		select 
+			s.*,
+			to_char(sale_date, 'YYYY-MM') as selling_month,
 			(s.quantity * p.price) as amount
 		from sales s
 		inner join products p 
